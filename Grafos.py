@@ -246,6 +246,7 @@ class Grafo:
 
 
 
+    # Punto 2
     def prim_vertice(self, inicio, visitados):
         aristas_arbol = []
         peso_total = 0
@@ -341,18 +342,22 @@ grafo.agregar_arista(1, 2, 400)
 
 # Menu
 df = pd.read_csv("flights_final.csv")
+
 df1 = df.head(20)
 g1 = Grafo(len(df1), True, False)
 g1.aeropuertos(df1)
 df1 = g1.haversine(df1)
-
 g1.vuelos(df1, "Haversine")
+
 
 def menu():
     print("\nLAB 2 — Grafos - Rutas Transporte Aereo")
     print("1) Grafo")
     print("2) Conexidad")
     print("3) Arbol de expansion minima")
+    print("4) punto 3")
+    print("5) punto 4")
+    print("6) Mostrar mapa en el grafo")
 
     print("0) Salir")
     return input("Elige opción: ").strip()
@@ -370,3 +375,7 @@ while True:
         
         elif op == "3":
             g1.arbol_expasion()
+
+        elif op == "6":
+            import Mapa
+            Mapa.mostrar_grafo(g1)
