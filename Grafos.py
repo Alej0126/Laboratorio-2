@@ -2,6 +2,7 @@
 
 import math
 import pandas as pd
+import heapq 
 
 
 
@@ -30,6 +31,104 @@ class Grafo:
             lista_vecinos = []
             self.adyacencia.append(lista_vecinos)
 
+    def vertice_por_indice(self, i):
+        return self.vertices[i] if 0 <= i < self.n else None
+
+    def info_vertice(self, i):
+        v = self.vertice_por_indice(i)
+        if not v:
+            return "Vértice no válido"
+        return (f"Código: {v.codigo}\n"
+                f"Aeropuerto: {v.aeropuerto}\n"
+                f"Ciudad: {v.ciudad}\n"
+                f"País: {v.pais}\n"
+                f"Lat: {v.latitud}\n"
+                f"Lon: {v.longitud}")
+
+    def info_vertice_por_codigo(self, codigo):
+        idx = self.indice_por_codigo(codigo)
+        if idx == -1:
+            return None, -1
+        return self.info_vertice(idx), idx
+
+    def dijkstra(self, fuente_idx):
+        INF = float('inf')
+        dist = [INF] * self.n
+        prev = [-1] * self.n
+
+        dist[fuente_idx] = 0.0
+        pq = [(0.0, fuente_idx)]  # (dist, node)
+
+        while pq:
+            d, u = heapq.heappop(pq)
+            if d != dist[u]:
+                continue
+
+            # Normaliza la lista de vecinos (tu adyacencia guarda (v,p) si ponderado)
+            for elem in self.adyacencia[u]:
+                if self.ponderado:
+                    v, w = elem
+                else:
+                    v, w = elem, 1.0
+                nd = d + float(w)
+                if nd < dist[v]:
+                    dist[v] = nd
+                    prev[v] = u
+                    heapq.heappush(pq, (nd, v))
+
+        return dist, prev
+    
+    def reconstruir_camino(self, prev, destino_idx):
+        camino = []
+        cur = destino_idx
+        while cur != -1:
+            camino.append(cur)
+            cur = prev[cur]
+        camino.reverse()
+        return camino 
+    
+    def top10_caminos_minimos_mas_largos(self, codigo_fuente):
+        fuente_idx = self.indice_por_codigo(codigo_fuente)
+        if fuente_idx == -1:
+            return None, "Código de aeropuerto no encontrado."
+
+        dist, prev = self.dijkstra(fuente_idx)
+
+        # destinos alcanzables distintos de la fuente
+        candidatos = [(dist[i], i) for i in range(self.n)
+                    if dist[i] not in (float('inf'), 0.0) and self.vertices[i] is not None]
+        if not candidatos:
+            print("No hay destinos alcanzables desde la fuente.")
+            return [], None
+
+        # orden descendente por distancia y tomar top-10
+        candidatos.sort(reverse=True, key=lambda x: x[0])
+        top = candidatos[:10]
+
+        print(f"\n--- Top 10 'caminos mínimos' más largos desde {codigo_fuente} ---")
+        resultado = []
+        for k, (d, i) in enumerate(top, 1):
+            v = self.vertices[i]
+            # reconstruir camino
+            camino_idx = self.reconstruir_camino(prev, i)
+            path_codes = [self.vertices[j].codigo for j in camino_idx if self.vertices[j] is not None]
+
+            print(f"{k:2d}) {v.codigo} - {v.aeropuerto}")
+            print(f"    Ciudad: {v.ciudad}, País: {v.pais}")
+            print(f"    Distancia (camino mínimo): {d:.2f} km")
+            print(f"    Camino: {' → '.join(path_codes)}\n")
+
+            resultado.append({
+                "codigo": v.codigo,
+                "aeropuerto": v.aeropuerto,
+                "ciudad": v.ciudad,
+                "pais": v.pais,
+                "lat": v.latitud,
+                "lon": v.longitud,
+                "distancia": d,
+                "camino": path_codes
+            })
+        return resultado, None
 
     def agregar_vertice(self, indice, vertice):
         if 0 <= indice < self.n:
@@ -41,20 +140,54 @@ class Grafo:
             if vertice and vertice.codigo == codigo:
                 return i
         return -1
+    
+    def resumen_simple(self):
+        vistas = set()        # (min(u,v), max(u,v)) para contar arista única
+        loops = 0
+        multiaristas = 0      # repeticiones en la MISMA lista de u
+        total_dirigidas = 0   # total de entradas en listas (contará 2 por arista no dirigida)
+
+        for u, vecinos in enumerate(self.adyacencia):
+            vistos_en_u = set()
+            for e in vecinos:
+                v, _w = e if isinstance(e, tuple) else (e, 1.0)
+                total_dirigidas += 1
+
+                if u == v:
+                    loops += 1
+                    continue
+
+                # multiarista: mismo v aparece más de una vez en la lista de u
+                if v in vistos_en_u:
+                    multiaristas += 1
+                else:
+                    vistos_en_u.add(v)
+
+                a, b = (u, v) if u < v else (v, u)
+                vistas.add((a, b))
+
+        print(f"Vértices (con datos): {sum(1 for x in self.vertices if x)}")
+        print(f"Aristas únicas (no dirigidas): {len(vistas)}")
+        print(f"Entradas en listas (esperable ~2*aristas): {total_dirigidas}")
+        print(f"Bucles detectados: {loops}")
+        print(f"Multiaristas reales (mismo u->v repetido): {multiaristas}")
+
+
 
 
     def agregar_arista(self, u, v, peso=1):
         if self.ponderado:
-            par1 = (v, peso)
-            self.adyacencia[u].append(par1)
-            if not self.dirigido:
-                par2 = (u, peso)
-                self.adyacencia[v].append(par2)
-        else:
-            self.adyacencia[u].append(v)
-            if not self.dirigido:
-                self.adyacencia[v].append(u)
 
+            if (v, peso) not in self.adyacencia[u]:
+                self.adyacencia[u].append((v, peso))
+            if not self.dirigido:
+                if (u, peso) not in self.adyacencia[v]:
+                    self.adyacencia[v].append((u, peso))
+        else:
+            if v not in self.adyacencia[u]:
+                self.adyacencia[u].append(v)
+            if not self.dirigido and u not in self.adyacencia[v]:
+                self.adyacencia[v].append(u)
 
     def mostrar(self): 
         print("Lista de adyacencia del grafo:")
@@ -172,30 +305,33 @@ class Grafo:
 
 
     def vuelos(self, df, columna_peso=None):
-        aristas = []
+
+        peso_min = {} 
 
         for _, fila in df.iterrows():
             u = self.indice_por_codigo(fila["Source Airport Code"])
             v = self.indice_por_codigo(fila["Destination Airport Code"])
-
             if u == -1 or v == -1:
                 continue
 
+         
+            if u == v:
+                continue
+
+           
             if columna_peso and columna_peso in fila:
-                peso = fila[columna_peso]
+                peso = float(fila[columna_peso])
             else:
-                peso = 1
+                peso = 1.0
 
-            repetida = False
-            for a in aristas:
-                if ((a[0] == u and a[1] == v) or (a[0] == v and a[1] == u)):
-                    repetida = True
-                    break
+            a, b = (u, v) if u < v else (v, u)
+      
+            if (a, b) not in peso_min or peso < peso_min[(a, b)]:
+                peso_min[(a, b)] = peso
 
-            if not repetida:
-                self.agregar_arista(u, v, peso)
-                aristas.append((u, v))
-    
+        for (a, b), w in peso_min.items():
+            self.agregar_arista(a, b, w)
+
 
 
     # Punto 1
@@ -319,31 +455,59 @@ class Grafo:
                 print(f"  {peso} : {nombre_u} -> {nombre_v}")
 
         return arboles
+    
+    def top10_caminos_minimos(self, codigo_fuente):
+        fuente_idx = self.indice_por_codigo(codigo_fuente)
+        if fuente_idx == -1:
+            print("No se encontró el aeropuerto fuente.")
+            return
+
+        dist, _ = self.dijkstra(fuente_idx)
+
+        alcanzables = [(dist[i], i) for i in range(self.n) if dist[i] != float('inf') and dist[i] != 0.0]
+
+        if not alcanzables:
+            print("No hay aeropuertos alcanzables desde este origen.")
+            return
+
+        alcanzables.sort(reverse=True, key=lambda x: x[0])
+
+        print(f"\n--- 10 caminos mínimos más largos desde {codigo_fuente} ---")
+        for k, (d, i) in enumerate(alcanzables[:10], 1):
+            v = self.vertices[i]
+            print(f"{k:2d}) {v.codigo} - {v.aeropuerto}")
+            print(f"    Ciudad: {v.ciudad}, País: {v.pais}")
+            print(f"    Latitud: {v.latitud}, Longitud: {v.longitud}")
+            print(f"    Distancia del camino: {d:.2f} km\n")
+
+    def camino_minimo(self, codigo_origen, codigo_destino):
+        origen_idx = self.indice_por_codigo(codigo_origen)
+        destino_idx = self.indice_por_codigo(codigo_destino)
+
+        if origen_idx == -1 or destino_idx == -1:
+            print("Uno o ambos códigos no existen en el grafo.")
+            return None, None, None
+
+        dist, prev = self.dijkstra(origen_idx)
+
+        if dist[destino_idx] == float('inf'):
+            print(f"No hay camino entre {codigo_origen} y {codigo_destino}.")
+            return None, None, None
+
+        camino_indices = self.reconstruir_camino(prev, destino_idx)
+        distancia_total = dist[destino_idx]
+        return camino_indices, distancia_total, prev
 
 
-# Pruebas
-grafo = Grafo(5, True, False)
-v1 = Vertice("JFK", "Nueva York Airport", "New York", "USA", 40.639751, -73.778925)
-v2 = Vertice("LAX", "Los Angeles Airport", "Los Angeles", "USA", 33.942791, -118.410042)
-v3 = Vertice("MIA", "Miami International", "Miami", "USA", 25.79325, -80.290556)
-v4 = Vertice("JFK", "Nueva York Airport", "New York", "USA", 40.639751, -73.778925)
-v5 = Vertice("MIA", "Miami International", "Miami", "USA", 25.79325, -80.290556)
-grafo.agregar_vertice(0, v1)
-grafo.agregar_vertice(1, v2)
-grafo.agregar_vertice(2, v3)
-grafo.agregar_vertice(3, v4)
-grafo.agregar_vertice(4, v4)
-grafo.agregar_arista(0, 1, 500)
-grafo.agregar_arista(1, 2, 400)
-grafo.agregar_arista(2, 0, 600)
-grafo.agregar_arista(0, 1, 500)
-grafo.agregar_arista(1, 2, 400)
+
+
 
 
 # Menu
 df = pd.read_csv("flights_final.csv")
 
-df1 = df.head(20)
+df1 =  df
+
 g1 = Grafo(len(df1), True, False)
 g1.aeropuertos(df1)
 df1 = g1.haversine(df1)
@@ -353,12 +517,12 @@ g1.vuelos(df1, "Haversine")
 def menu():
     print("\nLAB 2 — Grafos - Rutas Transporte Aereo")
     print("1) Grafo")
-    print("2) Conexidad")
-    print("3) Arbol de expansion minima")
-    print("4) punto 3")
-    print("5) punto 4")
-    print("6) Mostrar mapa en el grafo")
-
+    print("2) punto 1: Conexidad")
+    print("3) punto 2: Arbol de expansion minima")
+    print("4) punto 3: Info aeropuerto + Top 10 caminos mínimos más largos")
+    print("5) punto 4: Camino mínimo entre dos aeropuertos + mapa")
+    print("6) Mostrar grafo")
+    print("7) Resumen")
     print("0) Salir")
     return input("Elige opción: ").strip()
 
@@ -369,6 +533,7 @@ while True:
 
         elif op == "1":
             g1.mostrar()
+            
 
         elif op == "2":
             g1.conexidad()
@@ -376,6 +541,59 @@ while True:
         elif op == "3":
             g1.arbol_expasion()
 
+
+        elif op == "4":
+            
+            codigo = input("Ingresa el código IATA del aeropuerto fuente (ej: JFK): ").strip().upper()
+            info, idx = g1.info_vertice_por_codigo(codigo)
+            if idx == -1:
+                print("No se encontró el aeropuerto con ese código.")
+                continue
+
+            print("\n Información del aeropuerto fuente ")
+            print(info)
+
+            # Top 10 con CAMINOS reconstruidos
+            g1.top10_caminos_minimos_mas_largos(codigo)
+
+
+        elif op == "5":
+            origen = input("Código IATA del aeropuerto origen: ").strip().upper()
+            destino = input("Código IATA del aeropuerto destino: ").strip().upper()
+
+            camino, distancia_total, _ = g1.camino_minimo(origen, destino)
+            if not camino:
+                continue
+
+            print(f"\n Camino mínimo entre {origen} y {destino} ")
+            print(f"Distancia total: {distancia_total:.2f} km\n")
+
+            vertices_camino = []
+            for i in camino:
+                v = g1.vertices[i]
+                if v:
+
+                    print(f"{v.codigo} - {v.aeropuerto}")
+                    print(f"  Ciudad: {v.ciudad}, País: {v.pais}")
+                    print(f"  Latitud: {v.latitud}, Longitud: {v.longitud}\n")
+                    vertices_camino.append(v)
+
+            import json
+            coords = [[float(v.latitud), float(v.longitud)] for v in vertices_camino if v]
+            with open("camino_minimo.json", "w", encoding="utf-8") as f:
+                json.dump({"coords": coords}, f, indent=2)
+
+
+            try:
+                import Mapa
+                Mapa.mostrar_camino_minimo(vertices_camino)
+            except Exception as e:
+                print("No se pudo mostrar el camino en el mapa:", e)
+
+
         elif op == "6":
             import Mapa
             Mapa.mostrar_grafo(g1)
+
+        elif op == "7":
+            g1.resumen_simple()
