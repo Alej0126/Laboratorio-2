@@ -1,5 +1,4 @@
 # pylint: disable=missing-class-docstring,missing-function-docstring
-
 import math
 import pandas as pd
 import heapq 
@@ -51,20 +50,20 @@ class Grafo:
             return None, -1
         return self.info_vertice(idx), idx
 
+
     def dijkstra(self, fuente_idx):
         INF = float('inf')
         dist = [INF] * self.n
         prev = [-1] * self.n
 
         dist[fuente_idx] = 0.0
-        pq = [(0.0, fuente_idx)]  # (dist, node)
+        pq = [(0.0, fuente_idx)]
 
         while pq:
             d, u = heapq.heappop(pq)
             if d != dist[u]:
                 continue
 
-            # Normaliza la lista de vecinos (tu adyacencia guarda (v,p) si ponderado)
             for elem in self.adyacencia[u]:
                 if self.ponderado:
                     v, w = elem
@@ -94,14 +93,12 @@ class Grafo:
 
         dist, prev = self.dijkstra(fuente_idx)
 
-        # destinos alcanzables distintos de la fuente
         candidatos = [(dist[i], i) for i in range(self.n)
                     if dist[i] not in (float('inf'), 0.0) and self.vertices[i] is not None]
         if not candidatos:
             print("No hay destinos alcanzables desde la fuente.")
             return [], None
 
-        # orden descendente por distancia y tomar top-10
         candidatos.sort(reverse=True, key=lambda x: x[0])
         top = candidatos[:10]
 
@@ -109,7 +106,6 @@ class Grafo:
         resultado = []
         for k, (d, i) in enumerate(top, 1):
             v = self.vertices[i]
-            # reconstruir camino
             camino_idx = self.reconstruir_camino(prev, i)
             path_codes = [self.vertices[j].codigo for j in camino_idx if self.vertices[j] is not None]
 
@@ -142,10 +138,10 @@ class Grafo:
         return -1
     
     def resumen_simple(self):
-        vistas = set()        # (min(u,v), max(u,v)) para contar arista única
+        vistas = set()
         loops = 0
-        multiaristas = 0      # repeticiones en la MISMA lista de u
-        total_dirigidas = 0   # total de entradas en listas (contará 2 por arista no dirigida)
+        multiaristas = 0 
+        total_dirigidas = 0
 
         for u, vecinos in enumerate(self.adyacencia):
             vistos_en_u = set()
@@ -157,7 +153,6 @@ class Grafo:
                     loops += 1
                     continue
 
-                # multiarista: mismo v aparece más de una vez en la lista de u
                 if v in vistos_en_u:
                     multiaristas += 1
                 else:
@@ -505,7 +500,6 @@ class Grafo:
 
 # Menu
 df = pd.read_csv("flights_final.csv")
-
 df1 =  df
 
 g1 = Grafo(len(df1), True, False)
@@ -552,8 +546,6 @@ while True:
 
             print("\n Información del aeropuerto fuente ")
             print(info)
-
-            # Top 10 con CAMINOS reconstruidos
             g1.top10_caminos_minimos_mas_largos(codigo)
 
 
