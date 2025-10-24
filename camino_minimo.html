@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_407fdc1aa46eef51f7ede9047db0ec7e {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_407fdc1aa46eef51f7ede9047db0ec7e" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_407fdc1aa46eef51f7ede9047db0ec7e = L.map(
+                "map_407fdc1aa46eef51f7ede9047db0ec7e",
+                {
+                    center: [51.02220154, 71.46690369],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 4,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_a8c0421c0994930d778b17bde732dfc6 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_a8c0421c0994930d778b17bde732dfc6.addTo(map_407fdc1aa46eef51f7ede9047db0ec7e);
+        
+    
+            var marker_f03cd7a847ae87c2811e8bed9af87b91 = L.marker(
+                [51.02220154, 71.46690369],
+                {
+}
+            ).addTo(map_407fdc1aa46eef51f7ede9047db0ec7e);
+        
+    
+        var popup_ee97c0f91ee252b68c658e0c6fc68b2a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_afdda1e7a7e3fc8dc7198513d6b10484 = $(`<div id="html_afdda1e7a7e3fc8dc7198513d6b10484" style="width: 100.0%; height: 100.0%;">         <b>Astana International Airport</b> (TSE)<br>         Ciudad: Tselinograd<br>         País: Kazakhstan<br>         Lat: 51.0222 | Lon: 71.4669         </div>`)[0];
+                popup_ee97c0f91ee252b68c658e0c6fc68b2a.setContent(html_afdda1e7a7e3fc8dc7198513d6b10484);
+            
+        
+
+        marker_f03cd7a847ae87c2811e8bed9af87b91.bindPopup(popup_ee97c0f91ee252b68c658e0c6fc68b2a)
+        ;
+
+        
+    
+    
+            marker_f03cd7a847ae87c2811e8bed9af87b91.bindTooltip(
+                `<div>
+                     TSE
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_3ab1f9bab606ffd2e05703a18c67df10 = L.marker(
+                [43.35210037, 77.04049683],
+                {
+}
+            ).addTo(map_407fdc1aa46eef51f7ede9047db0ec7e);
+        
+    
+        var popup_83621fefabb1c50cc2704e87050d88b5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e5af08ecb5e433c385fe2ef27d90307f = $(`<div id="html_e5af08ecb5e433c385fe2ef27d90307f" style="width: 100.0%; height: 100.0%;">         <b>Almaty Airport</b> (ALA)<br>         Ciudad: Alma-ata<br>         País: Kazakhstan<br>         Lat: 43.3521 | Lon: 77.0405         </div>`)[0];
+                popup_83621fefabb1c50cc2704e87050d88b5.setContent(html_e5af08ecb5e433c385fe2ef27d90307f);
+            
+        
+
+        marker_3ab1f9bab606ffd2e05703a18c67df10.bindPopup(popup_83621fefabb1c50cc2704e87050d88b5)
+        ;
+
+        
+    
+    
+            marker_3ab1f9bab606ffd2e05703a18c67df10.bindTooltip(
+                `<div>
+                     ALA
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_de40b937c5dc7fd16d86502b01255d3e = L.marker(
+                [53.329102, 69.594597],
+                {
+}
+            ).addTo(map_407fdc1aa46eef51f7ede9047db0ec7e);
+        
+    
+        var popup_4f34a3e715746ababa271e83fe94cb43 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0c1d826bf8d9655d603353cafe6dddc5 = $(`<div id="html_0c1d826bf8d9655d603353cafe6dddc5" style="width: 100.0%; height: 100.0%;">         <b>Kokshetau Airport</b> (KOV)<br>         Ciudad: Kokshetau<br>         País: Kazakhstan<br>         Lat: 53.3291 | Lon: 69.5946         </div>`)[0];
+                popup_4f34a3e715746ababa271e83fe94cb43.setContent(html_0c1d826bf8d9655d603353cafe6dddc5);
+            
+        
+
+        marker_de40b937c5dc7fd16d86502b01255d3e.bindPopup(popup_4f34a3e715746ababa271e83fe94cb43)
+        ;
+
+        
+    
+    
+            marker_de40b937c5dc7fd16d86502b01255d3e.bindTooltip(
+                `<div>
+                     KOV
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6b54762e8f48238c48f166d477135c17 = L.polyline(
+                [[51.02220154, 71.46690369], [43.35210037, 77.04049683], [53.329102, 69.594597]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_407fdc1aa46eef51f7ede9047db0ec7e);
+        
+    
+            var layer_control_8fbb782072f63d1afaa6da9ef8837f94_layers = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_a8c0421c0994930d778b17bde732dfc6,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_8fbb782072f63d1afaa6da9ef8837f94 = L.control.layers(
+                layer_control_8fbb782072f63d1afaa6da9ef8837f94_layers.base_layers,
+                layer_control_8fbb782072f63d1afaa6da9ef8837f94_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_407fdc1aa46eef51f7ede9047db0ec7e);
+
+        
+</script>
+</html>
